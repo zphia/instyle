@@ -1,10 +1,8 @@
 package instyle_test
 
 import (
-	"fmt"
 	"testing"
 
-	"charm.land/lipgloss/v2"
 	"github.com/zphia/instyle"
 )
 
@@ -62,22 +60,6 @@ func BenchmarkApply(b *testing.B) {
 			_ = string(m.Apply([]rune(withStyle)))
 		}
 	})
-
-	b.Run("WithStyleToFromString_SimilarLipGloss", func(b *testing.B) {
-		styleBold := lipgloss.NewStyle().Bold(true)
-		styleFaint := lipgloss.NewStyle().Faint(true)
-		styleBoldCyan := lipgloss.NewStyle().Foreground(lipgloss.Cyan).Bold(true)
-		styleBoldMagenta := lipgloss.NewStyle().Foreground(lipgloss.Magenta).Bold(true)
-
-		for i := 0; i < b.N; i++ {
-			_ = fmt.Sprintf("%s sending request %s%s%s",
-				styleBold.Render("[tag]"),
-				styleFaint.Render("3.2 seconds ago... "),
-				styleBoldCyan.Render("log id: "),
-				styleBoldMagenta.Render("10298402358"),
-			)
-		}
-	})
 }
 
 func BenchmarkApply_ColourStrings(b *testing.B) {
@@ -88,25 +70,10 @@ func BenchmarkApply_ColourStrings(b *testing.B) {
 		}
 	})
 
-	b.Run("SingleHex_SimilarLipGloss", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			_ = lipgloss.NewStyle().Foreground(lipgloss.Color("#028466")).Render("colour")
-		}
-	})
-
 	b.Run("MultipleHex", func(b *testing.B) {
 		m := instyle.NewStyler()
 		for i := 0; i < b.N; i++ {
 			_ = m.ApplyStr("[~#028466]colour1[/] [~#d19645]colour2[/] [~#796ceb]colour3[/]")
-		}
-	})
-
-	b.Run("MultipleHex_SimilarLipGloss", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			c1 := lipgloss.NewStyle().Foreground(lipgloss.Color("#028466"))
-			c2 := lipgloss.NewStyle().Foreground(lipgloss.Color("#d19645"))
-			c3 := lipgloss.NewStyle().Foreground(lipgloss.Color("#796ceb"))
-			_ = c1.Render("colour1 ") + c2.Render("colour2 ") + c3.Render("colour3")
 		}
 	})
 

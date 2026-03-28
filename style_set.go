@@ -3,9 +3,6 @@ package instyle
 import (
 	"fmt"
 	"math"
-	"strings"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
 const (
@@ -51,16 +48,6 @@ type Styler interface {
 	//    s.Register("error", "1;31")
 	//    _ = s.Apply([]rune("[~error]Something unexpected happened"))
 	Register(name string, value string) (self Styler)
-
-	// RegisterLipGlossStyle will extract the text styling from a [lipgloss.Style] and register it under the name provided.
-	// Specifically, the following will be captured if set on the style:
-	//
-	//  - Foreground color
-	//  - Background color
-	//  - Text styling of bold / faint / italic / underline / blink / strikethrough
-	//
-	// [lipgloss.Style]: https://github.com/charmbracelet/lipgloss
-	RegisterLipGlossStyle(name string, value lipgloss.Style) (self Styler)
 }
 
 type styleSet struct {
@@ -81,46 +68,6 @@ func (s *styleSet) Register(name string, value string) Styler {
 
 	s.named[parsed] = []rune(value)
 	return s
-}
-
-func (s *styleSet) RegisterLipGlossStyle(name string, value lipgloss.Style) Styler {
-	p := lipgloss.ColorProfile()
-
-	var sequence []string
-
-	if _, noColor := value.GetForeground().(lipgloss.NoColor); !noColor {
-		sequence = append(sequence, p.FromColor(value.GetForeground()).Sequence(false))
-	}
-
-	if _, noColor := value.GetBackground().(lipgloss.NoColor); !noColor {
-		sequence = append(sequence, p.FromColor(value.GetBackground()).Sequence(true))
-	}
-
-	if value.GetBold() {
-		sequence = append(sequence, "1")
-	}
-
-	if value.GetFaint() {
-		sequence = append(sequence, "2")
-	}
-
-	if value.GetItalic() {
-		sequence = append(sequence, "3")
-	}
-
-	if value.GetUnderline() {
-		sequence = append(sequence, "4")
-	}
-
-	if value.GetBlink() {
-		sequence = append(sequence, "5")
-	}
-
-	if value.GetStrikethrough() {
-		sequence = append(sequence, "6")
-	}
-
-	return s.Register(name, strings.Join(sequence, ";"))
 }
 
 func (s *styleSet) Apply(runes []rune) []rune {
